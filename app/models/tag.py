@@ -3,14 +3,16 @@ from __future__ import annotations
 import uuid
 from typing import Optional
 
-from sqlalchemy import Boolean, Enum, ForeignKey, String, UniqueConstraint
+import enum
+import sqlalchemy as sa
+from sqlalchemy import Boolean, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
 
 
-class TagCategory(str, Enum):  # type: ignore[misc]
+class TagCategory(str, enum.Enum):  # type: ignore[misc]
     general = "general"
     development = "development"
     nutrition = "nutrition"
@@ -27,7 +29,7 @@ class Tag(Base):
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     label: Mapped[str] = mapped_column(String(200), nullable=False)
     category: Mapped[Optional[TagCategory]] = mapped_column(
-        Enum(TagCategory, name="tag_category")
+        sa.Enum(TagCategory, name="tag_category")
     )
     active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
@@ -44,4 +46,3 @@ class ChildTag(Base):
     tag_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("tag.id", ondelete="CASCADE"), primary_key=True
     )
-

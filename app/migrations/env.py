@@ -9,9 +9,14 @@ from sqlalchemy import pool
 from alembic import context
 
 # Ensure app package is importable
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+# Ensure '/app' (project root) is on sys.path so 'app' package can be imported
+_here = os.path.dirname(__file__)
+_project_root = os.path.abspath(os.path.join(_here, "..", "..", ".."))
+_app_dir = os.path.join(_project_root, "app")
+for p in {_project_root, _app_dir}:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
-from app.core.config import settings  # noqa: E402
 from app.models import Base  # noqa: E402
 
 
@@ -30,7 +35,7 @@ target_metadata = Base.metadata
 
 def get_url() -> str:
     # Prefer DATABASE_URL env; fallback to alembic.ini sqlalchemy.url
-    return settings.database_url or config.get_main_option("sqlalchemy.url")
+    return os.getenv("DATABASE_URL") or config.get_main_option("sqlalchemy.url")
 
 
 def run_migrations_offline() -> None:
@@ -73,4 +78,3 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
-

@@ -16,8 +16,8 @@ RUN pip install fastapi "uvicorn[standard]" pydantic sqlalchemy alembic psycopg2
 
 # Copy application code
 COPY app ./app
+COPY alembic.ini ./alembic.ini
 
 EXPOSE 8000
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-

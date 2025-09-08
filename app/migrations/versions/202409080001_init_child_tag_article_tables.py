@@ -21,13 +21,20 @@ depends_on = None
 
 def upgrade() -> None:
     # Enums
-    gender = sa.Enum("female", "male", "other", "undisclosed", name="gender")
+    gender = sa.Enum(
+        "female", "male", "other", "undisclosed", name="gender", create_type=False
+    )
     tag_category = sa.Enum(
-        "general", "development", "nutrition", "medical", "other", name="tag_category"
+        "general",
+        "development",
+        "nutrition",
+        "medical",
+        "other",
+        name="tag_category",
+        create_type=False,
     )
 
-    gender.create(op.get_bind(), checkfirst=True)
-    tag_category.create(op.get_bind(), checkfirst=True)
+    # Enum types will be created automatically by SQLAlchemy when tables are created.
 
     # child_profile
     op.create_table(
@@ -85,4 +92,3 @@ def downgrade() -> None:
     # drop enums
     sa.Enum(name="gender").drop(op.get_bind(), checkfirst=True)
     sa.Enum(name="tag_category").drop(op.get_bind(), checkfirst=True)
-
