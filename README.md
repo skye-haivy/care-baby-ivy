@@ -50,6 +50,15 @@ app/
   core/
     config.py
     db.py
+  models/
+    __init__.py
+    base.py
+    child.py
+    tag.py
+    article.py
+  migrations/
+    env.py
+    versions/
   main.py
 tests/
 scripts/
@@ -61,6 +70,18 @@ taxonomy/
 - Compose boots; `/health` returns 200 with `{ "status": "ok" }`.
 - `ruff` and `black` pass.
 - Commit message: `chore: bootstrap FastAPI + dockerized postgres + healthcheck`.
+
+## Database & Alembic
+
+- Init and configure Alembic under `app/migrations` with `target_metadata` from `app.models.Base`.
+- Generate/Apply migrations:
+
+```bash
+make migrate   # autogenerate (adjust message)
+make upgrade   # apply latest
+```
+
+Set `DATABASE_URL` in `.env` or environment. For Docker, it defaults to the service URL.
 
 ## Git
 
