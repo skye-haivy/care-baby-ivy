@@ -1,0 +1,33 @@
+[
+    { "slug": "age_newborn", "label": "Newborn (0–1m)", "category": "age" },
+    { "slug": "age_1_3m", "label": "1–3 months", "category": "age" },
+    { "slug": "age_3_6m", "label": "3–6 months", "category": "age" },
+    { "slug": "age_6_12m", "label": "6–12 months", "category": "age" },
+    { "slug": "age_12_24m", "label": "12–24 months", "category": "age" },
+    { "slug": "age_2_5y", "label": "2–5 years", "category": "age" },
+  
+    { "slug": "topic_sleep", "label": "Sleep", "category": "topic" },
+    { "slug": "topic_naps", "label": "Naps", "category": "topic" },
+    { "slug": "topic_feeding", "label": "Feeding", "category": "topic" },
+    { "slug": "topic_weaning", "label": "Weaning / Solids", "category": "topic" },
+    { "slug": "topic_allergies", "label": "Allergies", "category": "topic" },
+    { "slug": "topic_vaccines", "label": "Vaccines", "category": "topic" },
+    { "slug": "topic_development", "label": "Development & Milestones", "category": "topic" },
+    { "slug": "topic_screen_time", "label": "Screen Time", "category": "topic" },
+    { "slug": "topic_nutrition", "label": "Nutrition / Iron / Vitamin D", "category": "topic" },
+    { "slug": "topic_behavior", "label": "Behavior & Emotions", "category": "topic" },
+  
+    { "slug": "cond_eczema", "label": "Eczema", "category": "condition" },
+    { "slug": "cond_gerd", "label": "GERD / Reflux", "category": "condition" },
+    { "slug": "cond_asthma", "label": "Asthma (Pediatric)", "category": "condition" },
+    { "slug": "cond_rsv", "label": "RSV", "category": "condition" },
+    { "slug": "cond_fever", "label": "Fever", "category": "condition" },
+  
+    { "slug": "allergy_peanut", "label": "Peanut", "category": "allergy" },
+    { "slug": "allergy_egg", "label": "Egg", "category": "allergy" },
+    { "slug": "allergy_milk", "label": "Cow’s Milk", "category": "allergy" },
+  
+    { "slug": "pref_blw", "label": "Baby-Led Weaning (BLW)", "category": "preference" },
+    { "slug": "pref_low_sugar", "label": "Low Sugar", "category": "preference" }
+  ]
+  

@@ -16,6 +16,8 @@ RUN pip install fastapi "uvicorn[standard]" pydantic sqlalchemy alembic psycopg2
 
 # Copy application code
 COPY app ./app
+COPY taxonomy ./taxonomy
+COPY scripts ./scripts
 COPY alembic.ini ./alembic.ini
 
 EXPOSE 8000

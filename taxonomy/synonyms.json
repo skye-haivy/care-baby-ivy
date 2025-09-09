@@ -1,0 +1,52 @@
+{
+    "sleep training": "topic_sleep",
+    "sleep": "topic_sleep",
+    "nap": "topic_naps",
+    "naps": "topic_naps",
+    "short naps": "topic_naps",
+  
+    "feeding": "topic_feeding",
+    "bottle": "topic_feeding",
+    "breastfeeding": "topic_feeding",
+    "formula": "topic_feeding",
+  
+    "weaning": "topic_weaning",
+    "solids": "topic_weaning",
+    "blw": "pref_blw",
+    "baby led weaning": "pref_blw",
+  
+    "allergy": "topic_allergies",
+    "allergies": "topic_allergies",
+    "peanut": "allergy_peanut",
+    "peanut intro": "allergy_peanut",
+    "egg": "allergy_egg",
+    "dairy": "allergy_milk",
+    "cow milk": "allergy_milk",
+  
+    "eczema": "cond_eczema",
+    "atopic dermatitis": "cond_eczema",
+    "reflux": "cond_gerd",
+    "gerd": "cond_gerd",
+    "asthma": "cond_asthma",
+    "fever": "cond_fever",
+    "rsv": "cond_rsv",
+  
+    "vaccination": "topic_vaccines",
+    "vaccine": "topic_vaccines",
+    "shots": "topic_vaccines",
+  
+    "development": "topic_development",
+    "milestones": "topic_development",
+  
+    "screen time": "topic_screen_time",
+    "tablet": "topic_screen_time",
+  
+    "nutrition": "topic_nutrition",
+    "iron": "topic_nutrition",
+    "vitamin d": "topic_nutrition",
+  
+    "behavior": "topic_behavior",
+    "tantrum": "topic_behavior",
+    "tantrums": "topic_behavior"
+  }
+  
