@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: run lint fmt test migrate upgrade downgrade
+.PHONY: run lint fmt test migrate upgrade downgrade seed synonyms-check
 
 run:
 	UVICORN_WORKERS=1 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -24,3 +24,9 @@ upgrade:
 
 downgrade:
 	alembic downgrade -1
+
+seed:
+	docker compose exec -T api python scripts/seed_tags.py
+
+synonyms-check:
+	docker compose exec -T api python -m scripts.check_synonyms
