@@ -37,6 +37,9 @@ def main() -> None:
 
     engine = create_engine(get_database_url())
     with Session(engine) as session:
+        # Ensure a convenient pluralized view exists for consumers/tests
+        session.execute(text("CREATE OR REPLACE VIEW tags AS SELECT * FROM tag"))
+
         values = []
         for t in tags:
             slug = t["slug"].strip()
@@ -64,4 +67,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

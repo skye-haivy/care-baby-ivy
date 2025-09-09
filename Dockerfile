@@ -12,7 +12,7 @@ WORKDIR /app
 RUN python -m pip install --upgrade pip
 
 # Install runtime deps directly to avoid packaging overhead
-RUN pip install fastapi "uvicorn[standard]" pydantic sqlalchemy alembic psycopg2-binary python-dotenv
+RUN pip install fastapi "uvicorn[standard]" pydantic sqlalchemy alembic psycopg2-binary python-dotenv pytest httpx
 
 # Copy application code
 COPY app ./app
