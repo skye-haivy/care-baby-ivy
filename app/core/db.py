@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
+from app.models.base import Base  # re-export for tests expecting Base in this module
 
 
 # Create a SQLAlchemy engine only if DATABASE_URL is provided.
@@ -21,4 +22,3 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
-

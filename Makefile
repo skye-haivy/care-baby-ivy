@@ -33,6 +33,10 @@ synonyms-check:
 
 test-docker:
 	@cid=$$(docker compose ps -q api); \
-		docker compose exec -T api sh -lc 'rm -rf /app/tests && mkdir -p /app'; \
+		docker compose exec -T api sh -lc 'rm -rf /app/tests /app/app /app/taxonomy /app/scripts && mkdir -p /app'; \
+		docker cp app $$cid:/app/app; \
+		docker cp taxonomy $$cid:/app/taxonomy; \
+		docker cp scripts $$cid:/app/scripts; \
 		docker cp tests $$cid:/app/tests; \
-		docker compose exec -T api pytest -q
+		docker compose exec -T api python scripts/seed_tags.py; \
+		docker compose exec -T api sh -lc 'PYTHONPATH=/app pytest -q'
