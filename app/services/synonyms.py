@@ -31,3 +31,7 @@ def canonicalize(text: str) -> Optional[str]:
     key = normalize(text)
     return _SYN_MAP.get(key)
 
+
+def _synonyms_map() -> dict[str, str]:
+    """Expose the normalized synonym mapping for read-only reuse."""
+    return _SYN_MAP

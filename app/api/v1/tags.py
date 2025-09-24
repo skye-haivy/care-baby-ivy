@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
@@ -74,3 +74,15 @@ def put_child_tags(
     tags = [TagOut(**t) for t in normalized]
     return ChildTagsOut(child_id=str(child_id), tags=tags, suggestions=[])
 
+
+@router.get("/tags/suggest")
+def suggest(
+    q: str = Query(...),
+    limit: int = Query(8, ge=1),
+    db: Session = Depends(get_db),
+):
+    try:
+        results = tagging_service.suggest_from_text(db, q, limit)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid query")
+    return {"query": q, "results": results}

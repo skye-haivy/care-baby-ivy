@@ -4,7 +4,7 @@ import re
 import uuid
 from typing import Iterable, Optional
 
-from sqlalchemy import Select, delete, func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.core.db import SessionLocal
@@ -13,6 +13,15 @@ from app.services import synonyms as syn
 
 
 _NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
+
+CATEGORY_ORDER = {
+    "topic": 0,
+    "condition": 1,
+    "allergy": 2,
+    "age": 3,
+    "preference": 4,
+    "custom": 5,
+}
 
 
 def _ensure_session(db: Optional[Session]) -> Session:
@@ -30,51 +39,101 @@ def _slugify(text: str) -> str:
     return s or "x"
 
 
-def suggest_from_text(db_or_q, maybe_q: Optional[str] = None, *, db: Optional[Session] = None) -> list[dict]:
-    # Support call styles: (q) or (db, q)
-    if isinstance(db_or_q, Session):
-        db = db_or_q
-        q = maybe_q or ""
-    else:
-        q = str(db_or_q or "")
-    q = q.strip()
-    if not q:
-        return []
+def suggest_from_text(db: Session, q: str, limit: int = 8) -> list[dict]:
+    q = q or ""
+    qn = syn.normalize(q)
+    if not qn or len(qn) < 2 or len(qn) > 40:
+        raise ValueError("bad query length")
 
-    local = _ensure_session(db)
-    should_close = db is None
-    try:
-        suggestions: list[Tag] = []
-        seen: set[str] = set()
+    limit = max(1, min(limit, 20))
 
-        like = f"%{q}%"
-        stmt: Select = select(Tag).where(Tag.active.is_(True), Tag.label.ilike(like)).limit(8)
-        for row in local.execute(stmt).scalars().all():
-            if row.slug not in seen:
-                seen.add(row.slug)
-                suggestions.append(row)
-            if len(suggestions) >= 8:
-                break
+    like = f"%{qn}%"
+    stmt = (
+        select(Tag.slug, Tag.label, Tag.category)
+        .where(Tag.active.is_(True), func.lower(Tag.label).like(like))
+        .limit(200)
+    )
+    rows = db.execute(stmt).all()
 
-        if len(suggestions) < 8:
-            norm_q = syn.normalize(q)
-            matched_slugs = []
-            for key, slug in syn._SYN_MAP.items():  # type: ignore[attr-defined]
-                if norm_q in key and slug not in seen:
-                    matched_slugs.append(slug)
-            if matched_slugs:
-                stmt2 = select(Tag).where(Tag.slug.in_(matched_slugs), Tag.active.is_(True))
-                for row in local.execute(stmt2).scalars().all():
-                    if row.slug not in seen:
-                        seen.add(row.slug)
-                        suggestions.append(row)
-                    if len(suggestions) >= 8:
-                        break
+    synmap = syn._synonyms_map()
+    slug_synonyms: dict[str, list[str]] = {}
+    for key, slug in synmap.items():
+        slug_synonyms.setdefault(slug, []).append(key)
 
-        return [{"slug": t.slug, "label": t.label, "category": None} for t in suggestions]
-    finally:
-        if should_close:
-            local.close()
+    def _category_value(cat):
+        if cat is None:
+            return None
+        if hasattr(cat, "value"):
+            cat_val = cat.value  # type: ignore[attr-defined]
+        else:
+            cat_val = str(cat)
+        return str(cat_val).lower()
+
+    by_slug: dict[str, dict] = {}
+    for row in rows:
+        slug = row.slug
+        if slug in by_slug:
+            continue
+        by_slug[slug] = {
+            "slug": slug,
+            "label": row.label,
+            "category": _category_value(row.category),
+        }
+
+    syn_hits: set[str] = set()
+    for key, slug in synmap.items():
+        if qn in key:
+            syn_hits.add(slug)
+
+    missing_slugs = [s for s in syn_hits if s not in by_slug]
+    if missing_slugs:
+        syn_stmt = (
+            select(Tag.slug, Tag.label, Tag.category)
+            .where(Tag.active.is_(True), Tag.slug.in_(missing_slugs))
+        )
+        for row in db.execute(syn_stmt).all():
+            by_slug.setdefault(
+                row.slug,
+                {
+                    "slug": row.slug,
+                    "label": row.label,
+                    "category": _category_value(row.category),
+                },
+            )
+
+    items = list(by_slug.values())
+
+    def score(item: dict) -> tuple:
+        label_norm = syn.normalize(item["label"])
+        slug = item["slug"]
+        syn_keys = slug_synonyms.get(slug, [])
+
+        prefix_label = label_norm.startswith(qn)
+        prefix_syn = any(key.startswith(qn) for key in syn_keys)
+        contains_label = qn in label_norm
+        contains_syn = any(qn in key for key in syn_keys)
+
+        if prefix_label:
+            pri = 0
+        elif prefix_syn:
+            pri = 1
+        elif contains_label:
+            pri = 2
+        elif contains_syn:
+            pri = 3
+        else:
+            pri = 4
+
+        category = item.get("category")
+        return (
+            pri,
+            CATEGORY_ORDER.get(category, 9),
+            len(item["label"]),
+            slug,
+        )
+
+    items.sort(key=score)
+    return items[:limit]
 
 
 def resolve_to_tag_ids(db_or_inputs, maybe_inputs: Optional[list[str]] = None, allow_custom: bool = True, *, db: Optional[Session] = None) -> list[uuid.UUID]:
