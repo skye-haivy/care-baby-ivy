@@ -29,11 +29,11 @@ def assert_child_owned(db: Session, child_id: str, user_id: str) -> ChildProfile
         cid = uuid.UUID(str(child_id))
     except Exception:
         # child_id path param invalid
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
 
     child = db.get(ChildProfile, cid)
     if child is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
 
     if str(child.user_id) != str(user_id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
@@ -84,5 +84,5 @@ def suggest(
     try:
         results = tagging_service.suggest_from_text(db, q, limit)
     except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid query")
+        raise HTTPException(status_code=400, detail="invalid_query")
     return {"query": q, "results": results}
